@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF2Test</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: sans-serif; /* Un font base per migliore leggibilità */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 100%; /* I bottoni lunghi sono più comodi su mobile */
+            box-sizing: border-box;
+        }
+        .counter-controls button {
+            width: auto; /* Tranne quelli del contatore +/- */
+        }
+        .value-display {
+            font-size: 1.2rem;
+            min-width: 30px;
+            text-align: center;
+        }
+        input[type="range"] {
+            width: 100%;
+            padding: 10px 0;
+        }
+        select {
+            /* Adatta la listbox al mobile */
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+        }
+        .testo-risultato {
+            font-size: 1.2rem;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="section">
+            <label>Credito</label>
+            <div class="counter-controls">
+                <button onclick="modificaCredito(-1)">-</button>
+                <span id="credito-val" class="value-display">0</span>
+                <button onclick="modificaCredito(1)">+</button>
+            </div>
+        </div>
+
+        <hr style="width: 100%;">
+
+        <div class="section">
+            <label for="karma">Karma: <span id="karma-val">0</span></label>
+            <input type="range" id="karma" min="-7" max="7" value="0">
+        </div>
+
+        <hr style="width: 100%;">
+
+        <div class="section">
+            <label for="vita">Vita: <span id="vita-val">10</span></label>
+            <input type="range" id="vita" min="0" max="10" value="10">
+        </div>
+
+        <hr style="width: 100%;">
+
+        <div class="section">
+            <label id="testo-round" style="font-weight: bold; font-size: 1.3rem;">Round: 1</label>
+            
+            <select id="scelta-azione" required>
+                <option value="" disabled selected>Seleziona un'azione...</option>
+                <option value="Collabora">Collabora</option>
+                <option value="Tradisci">Tradisci</option>
+                <option value="Bersaglia Blu">Bersaglia Blu</option>
+                <option value="Bersaglia Rosso">Bersaglia Rosso</option>
+                <option value="Bersaglia Verde">Bersaglia Verde</option>
+                <option value="Bersaglia Giallo">Bersaglia Giallo</option>
+                <option value="Bersaglia Nero">Bersaglia Nero</option>
+            </select>
+            
+            <div id="testo-scelta" class="testo-risultato" style="display: none;"></div>
+            
+            <button id="btn-round" onclick="gestisciRound()">Conferma</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Logica Credito
+        let credito = 0;
+        const creditoElement = document.getElementById('credito-val');
+        
+        function modificaCredito(valore) {
+            credito += valore;
+            creditoElement.textContent = credito;
+        }
+
+        // Logica Karma
+        const karmaSlider = document.getElementById('karma');
+        const karmaVal = document.getElementById('karma-val');
+        karmaSlider.addEventListener('input', function() {
+            karmaVal.textContent = this.value;
+        });
+
+        // Logica Vita
+        const vitaSlider = document.getElementById('vita');
+        const vitaVal = document.getElementById('vita-val');
+        vitaSlider.addEventListener('input', function() {
+            vitaVal.textContent = this.value;
+        });
+
+        // Logica Round
+        let numeroRound = 1;
+        let faseConfermata = false;
+        
+        const testoRound = document.getElementById('testo-round');
+        const selectAzione = document.getElementById('scelta-azione');
+        const testoScelta = document.getElementById('testo-scelta');
+        const btnRound = document.getElementById('btn-round');
+
+        function gestisciRound() {
+            if (!faseConfermata) {
+                // Se siamo nella fase in cui l'utente deve confermare la scelta
+                if (selectAzione.value === "") {
+                    alert("Seleziona un'azione prima di procedere.");
+                    return;
+                }
+                
+                // Nascondi la select, mostra il testo
+                testoScelta.textContent = "Hai scelto: " + selectAzione.value;
+                selectAzione.style.display = "none";
+                testoScelta.style.display = "block";
+                
+                // Aggiorna il pulsante e lo stato
+                btnRound.textContent = "Prossimo Round";
+                faseConfermata = true;
+                
+            } else {
+                // Se stiamo passando al round successivo
+                numeroRound++;
+                testoRound.textContent = "Round: " + numeroRound;
+                
+                // Ripristina la select a vuoto e nascondi il testo
+                selectAzione.value = "";
+                selectAzione.style.display = "block";
+                testoScelta.style.display = "none";
+                
+                // Aggiorna il pulsante e lo stato
+                btnRound.textContent = "Conferma";
+                faseConfermata = false;
+            }
+        }
+    </script>
+
+</body>
+</html>
